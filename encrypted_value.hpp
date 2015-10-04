@@ -48,79 +48,79 @@ namespace misc
 
     typedef xor_encryption_impl<> default_encryption_impl;
 
-template<typename T, typename encryption = default_encryption_impl, typename std::enable_if<std::is_scalar<T>::value>::type* = nullptr>
-struct encrypted_variable
-{
-    encrypted_variable()
+    template<typename T, typename encryption = default_encryption_impl, typename std::enable_if<std::is_scalar<T>::value>::type* = nullptr>
+    struct encrypted_variable
     {
-        set(T());
-    }
+        encrypted_variable()
+        {
+            set(T());
+        }
 
-    encrypted_variable(const T& _value)
-    {
-        set(_value);
-    }
+        encrypted_variable(const T& _value)
+        {
+            set(_value);
+        }
 
-    encrypted_variable(const encrypted_variable<T>& _copy)
-    {
-        set(_copy.get());
-    }
+        encrypted_variable(const encrypted_variable<T>& _copy)
+        {
+            set(_copy.get());
+        }
 
-    encrypted_variable(encrypted_variable<T>&& _move)
-    {
-        set(_move.get());
-    }
+        encrypted_variable(encrypted_variable<T>&& _move)
+        {
+            set(_move.get());
+        }
 
-    encrypted_variable<T>& operator= (const encrypted_variable<T>& other)
-    {
-        encrypted_variable<T> temporary(other);
+        encrypted_variable<T>& operator= (const encrypted_variable<T>& other)
+        {
+            encrypted_variable<T> temporary(other);
 
-        set(temporary.get());
+            set(temporary.get());
 
-        return *this;
-    }
+            return *this;
+        }
 
-    encrypted_variable<T>& operator=(const T& _value)
-    {
-        this->set(_value);
-        return *this;
-    }
+        encrypted_variable<T>& operator=(const T& _value)
+        {
+            this->set(_value);
+            return *this;
+        }
 
-    encrypted_variable<T>& operator= (encrypted_variable<T>&& other)
-    {
-        set(other.get());
+        encrypted_variable<T>& operator= (encrypted_variable<T>&& other)
+        {
+            set(other.get());
 
-        return *this;
-    }
+            return *this;
+        }
 
-    operator T() const
-    {
-        return get();
-    }
+        operator T() const
+        {
+            return get();
+        }
 
-    void set(const T& _value)
-    {
-        T copy(_value);
+        void set(const T& _value)
+        {
+            T copy(_value);
 
-        uint8_t* ptr = (uint8_t*)&copy;
-        uint8_t* local = (uint8_t*)&value;
+            uint8_t* ptr = (uint8_t*)&copy;
+            uint8_t* local = (uint8_t*)&value;
 
-        m_encryption_impl.encrypt(local, ptr, sizeof(T));
-    }
+            m_encryption_impl.encrypt(local, ptr, sizeof(T));
+        }
 
-    T get() const
-    {
-        T copy;
+        T get() const
+        {
+            T copy;
 
-        uint8_t* ptr = (uint8_t*)&copy;
-        uint8_t* local = (uint8_t*)&value;
+            uint8_t* ptr = (uint8_t*)&copy;
+            uint8_t* local = (uint8_t*)&value;
 
-        m_encryption_impl.decrypt(ptr, local, sizeof(T));
+            m_encryption_impl.decrypt(ptr, local, sizeof(T));
 
-        return copy;
-    }
+            return copy;
+        }
 
-    T value;
-    encryption m_encryption_impl;
-};
+        T value;
+        encryption m_encryption_impl;
+    };
 }
